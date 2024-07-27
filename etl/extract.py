@@ -63,14 +63,25 @@ for n in ngram_lengths:
 # Open the input file and read its contents into a list of tuples
 with open(input_filename, "r") as input_file:
     reader = csv.reader(input_file)
-    data = [(row[0], int(row[1])) for row in reader]
+    data = [(row[0].replace("'", "’"), int(row[1])) for row in reader]
+
+def size(word: str) -> int:
+    res = 0
+    for letter in word:
+        if ord(letter) < 128:
+            res += 1
+        else:
+            res += 2
+    return res
 
 # Loop over each word in the input file, and extract its n-grams
 for word, frequency in data:
     for n in ngram_lengths:
         for i in range(len(word) - n + 1):
             ngram = word[i:i+n]
-            ngrams[n][ngram] += frequency
+            ngram_size = size(ngram)
+            if ngram_size in ngram_lengths:
+                ngrams[ngram_size][ngram] += frequency
 
 # Loop over each n-gram length, and write the most frequent n-grams to a file
 for n in ngram_lengths:
